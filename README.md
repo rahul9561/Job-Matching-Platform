@@ -89,6 +89,7 @@ The system combines a **React.js frontend**, a **Django REST Framework backend**
 ```bash
 git clone https://github.com/yourusername/job-matching-platform.git
 cd job-matching-platform
+```
 
 2️⃣ Backend Setup (Django + DRF)
 ```bash
