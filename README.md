@@ -87,7 +87,7 @@ The system combines a **React.js frontend**, a **Django REST Framework backend**
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/yourusername/job-matching-platform.git
+git clone https://github.com/rahul9561/job-matching-platform.git
 cd job-matching-platform
 ```
 
@@ -98,6 +98,7 @@ python -m venv venv
 source venv/bin/activate   # (Windows: venv\Scripts\activate)
 pip install -r requirements.txt
 python manage.py migrate
+python manage.py createsuperuser  # Optional: Create admin user
 python manage.py runserver
 ```
 
