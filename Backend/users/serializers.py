@@ -37,9 +37,29 @@ class CandidateProfileSerializer(serializers.ModelSerializer):
         model = CandidateProfile
         fields = '__all__'
 
+
+
 class RecruiterProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    
+
     class Meta:
         model = RecruiterProfile
         fields = '__all__'
+        read_only_fields = ['user']
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['user'] = request.user
+        else:
+            raise serializers.ValidationError({"user": "Authenticated user is required to create a profile."})
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        if not request or not hasattr(request, 'user') or instance.user != request.user:
+            raise serializers.ValidationError({"user": "You do not have permission to update this profile."})
+
+        # Ensure the user cannot be changed
+        validated_data.pop('user', None)
+        return super().update(instance, validated_data)

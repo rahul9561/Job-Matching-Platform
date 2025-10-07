@@ -21,7 +21,9 @@ import ResumeUpload from "./components/candidate/ResumeUpload";
 import JobMatches from "./components/candidate/JobMatches";
 import RecruiterDashboard from "./components/recruiter/RecruiterDashboard";
 import JobForm from "./components/recruiter/JobForm";
+import CandidatesView from "./components/recruiter/CandidatesView";
 import NotFound from "./components/NotFound";
+import EditJob from "./components/recruiter/EditJob";
 
 const theme = createTheme({
   palette: {
@@ -87,6 +89,22 @@ function App() {
               element={
                 <ProtectedRoute allowedUserTypes={["recruiter"]}>
                   <JobForm />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/recruiter/candidates"
+              element={
+                <ProtectedRoute allowedUserTypes={["recruiter"]}>
+                  <CandidatesView />
+                </ProtectedRoute>
+              }
+            />
+                        <Route
+              path="/recruiter/edit-job/:jobId"
+              element={
+                <ProtectedRoute allowedUserTypes={["recruiter"]}>
+                  <EditJob />
                 </ProtectedRoute>
               }
             />

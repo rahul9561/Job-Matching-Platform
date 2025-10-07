@@ -70,6 +70,14 @@ export const jobAPI = {
   delete: (id) => api.delete(`/jobs/${id}/`),
 };
 
+
+ // Candidate APIs
+export const candidateAPI = {
+  list: (params) => api.get('/candidates/', { params }),
+  get: (id) => api.get(`/candidates/${id}/`),
+  update: (id, data) => api.patch(`/candidates/${id}/`, data),
+};
+
 // Resume APIs
 export const resumeAPI = {
   list: () => api.get('/resumes/'),

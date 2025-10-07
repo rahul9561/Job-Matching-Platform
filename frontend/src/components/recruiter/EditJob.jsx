@@ -1,5 +1,6 @@
-import  { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// components/recruiter/EditJob.js
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Container,
   Box,
@@ -19,6 +20,7 @@ import {
   InputAdornment,
   FormHelperText,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import {
   BusinessCenter as BusinessCenterIcon,
@@ -28,10 +30,13 @@ import {
   LocationOnOutlined as LocationOnOutlinedIcon,
   MonetizationOnOutlined as MonetizationOnOutlinedIcon,
   ArrowForward as ArrowForwardIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { jobAPI } from '../../services/api';
 
-function JobForm() {
+function EditJob() {
+  const { jobId } = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -45,7 +50,34 @@ function JobForm() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [jobLoading, setJobLoading] = useState(true);
+
+  useEffect(() => {
+    fetchJob();
+  }, [jobId]);
+
+  const fetchJob = async () => {
+    try {
+      setJobLoading(true);
+      const response = await jobAPI.get(jobId);
+      const job = response.data;
+      setFormData({
+        title: job.title,
+        description: job.description,
+        requirements: job.requirements,
+        skills_required: job.skills_required,
+        experience_level: job.experience_level,
+        job_type: job.job_type,
+        location: job.location,
+        salary_min: job.salary_min || '',
+        salary_max: job.salary_max || '',
+      });
+    } catch (err) {
+      setError('Failed to load job details',err);
+    } finally {
+      setJobLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,10 +85,10 @@ function JobForm() {
     setError('');
 
     try {
-      await jobAPI.create(formData);
+      await jobAPI.update(jobId, formData);
       navigate('/recruiter/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to create job');
+      setError(err.response?.data?.detail || 'Failed to update job');
     } finally {
       setLoading(false);
     }
@@ -80,16 +112,26 @@ function JobForm() {
     });
   };
 
+  if (jobLoading) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
         <BusinessCenterIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
         <Box>
           <Typography variant="h3" component="h1" fontWeight="bold">
-            Create Job Posting
+            Edit Job Posting
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Fill in the details to attract top talent
+            Update the details to refine your job listing
           </Typography>
         </Box>
       </Box>
@@ -301,12 +343,20 @@ function JobForm() {
 
         <Divider sx={{ my: 4 }} />
 
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={() => navigate('/recruiter/dashboard')}
+          >
+            Cancel
+          </Button>
           <Button
             type="submit"
             variant="contained"
             size="large"
             disabled={loading}
+            startIcon={<SaveIcon />}
             sx={{
               px: 6,
               py: 1.5,
@@ -316,7 +366,7 @@ function JobForm() {
               boxShadow: 3,
             }}
           >
-            {loading ? 'Publishing...' : 'Publish Job'}
+            {loading ? 'Saving...' : 'Save Changes'}
           </Button>
         </Box>
       </form>
@@ -324,4 +374,4 @@ function JobForm() {
   );
 }
 
-export default JobForm;
+export default EditJob;

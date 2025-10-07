@@ -1,0 +1,79 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [frontend, backend, ml-service]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # -------------------- Frontend (React + Vite) --------------------
+    - name: Setup Node.js
+      if: matrix.service == 'frontend'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install & Build Frontend
+      if: matrix.service == 'frontend'
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+
+    - name: Run Frontend Tests
+      if: matrix.service == 'frontend'
+      run: |
+        cd frontend
+        npm run test --if-present
+
+    # -------------------- Backend (Django) --------------------
+    - name: Setup Python
+      if: matrix.service == 'backend'
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install Dependencies (Django)
+      if: matrix.service == 'backend'
+      run: |
+        cd backend
+        pip install -r requirements.txt
+
+    - name: Run Django Tests
+      if: matrix.service == 'backend'
+      run: |
+        cd backend
+        python manage.py migrate --settings=backend.settings
+        python manage.py test
+
+    # -------------------- ML Service (FastAPI) --------------------
+    - name: Setup Python
+      if: matrix.service == 'ml-service'
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install Dependencies (FastAPI)
+      if: matrix.service == 'ml-service'
+      run: |
+        cd ml-service
+        pip install -r requirements.txt
+
+    - name: Run FastAPI Tests
+      if: matrix.service == 'ml-service'
+      run: |
+        cd ml-service
+        pytest
