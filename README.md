@@ -6,6 +6,7 @@ The system combines a **React.js frontend**, a **Django REST Framework backend**
 ---
 
 ## 📌 Architecture Overview  
+```
 
                           ┌────────────────────────┐
                           │        Frontend        │
@@ -38,7 +39,7 @@ The system combines a **React.js frontend**, a **Django REST Framework backend**
 
 
 ---
-
+```
 ## ⚙️ Tech Stack  
 
 ### **Frontend**
